@@ -18,7 +18,7 @@ contract Ballot {
     struct Proposal {
         // If you can limit the length to a certain number of bytes, 
         // always use one of bytes1 to bytes32 because they are much cheaper
-        bytes32 name;   // short name (up to 32 bytes)
+        string name;   // short name (up to 32 bytes)
         uint voteCount; // number of accumulated votes
     }
 
@@ -32,10 +32,11 @@ contract Ballot {
      * @dev Create a new ballot to choose one of 'proposalNames'.
      * @param proposalNames names of proposals
      */
-    constructor(bytes32[] memory proposalNames) {
+    constructor(string[] memory proposalNames) {
         chairperson = msg.sender;
         voters[chairperson].weight = 1;
 
+        // create proposals and append them to proposals array
         for (uint i = 0; i < proposalNames.length; i++) {
             // 'Proposal({...})' creates a temporary
             // Proposal object and 'proposals.push(...)'
@@ -126,12 +127,21 @@ contract Ballot {
         }
     }
 
+    /**
+     * return the number of votes casted for the winning proposal
+    */
+    function winningProposalVoteCount() public view 
+            returns (uint winningVoteCount_)
+    {
+        winningVoteCount_ = proposals[winningProposal()].voteCount;
+    }
+
     /** 
      * @dev Calls winningProposal() function to get the index of the winner contained in the proposals array and then
      * @return winnerName_ the name of the winner
      */
     function winnerName() public view
-            returns (bytes32 winnerName_)
+            returns (string memory winnerName_)
     {
         winnerName_ = proposals[winningProposal()].name;
     }
